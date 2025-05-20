@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import 'bulma/css/bulma.css';
 import './App.scss';
 
@@ -20,25 +20,38 @@ export const App = () => {
   const [sortType, setSortType] = useState(null);
   const [isReversed, setIsReversed] = useState(false);
 
-  const handleAlphabetSort = () => {
-    const sorted = [...goodsFromServer].sort((a, b) => a.localeCompare(b));
+  useEffect(() => {
+    if (!sortType) return;
 
-    setGoods(isReversed ? sorted.reverse() : sorted);
+    let sorted;
+
+    if (sortType === 'alphabet') {
+      sorted = [...goodsFromServer].sort((a, b) => a.localeCompare(b));
+    } else if (sortType === 'length') {
+      sorted = [...goodsFromServer].sort((a, b) => a.length - b.length);
+    }
+
+    if (isReversed) {
+      sorted.reverse();
+    }
+
+    setGoods(sorted);
+  }, [sortType, isReversed]);
+
+  const handleAlphabetSort = () => {
     setSortType('alphabet');
   };
 
   const handleLengthSort = () => {
-    const sorted = [...goodsFromServer].sort((a, b) => a.length - b.length);
-
-    setGoods(isReversed ? sorted.reverse() : sorted);
     setSortType('length');
   };
 
   const handleReverse = () => {
-    const newIsReversed = !isReversed;
-
-    setGoods(prev => [...prev].reverse());
-    setIsReversed(newIsReversed);
+    if (!sortType) {
+      setGoods(prev => [...prev].reverse());
+    } else {
+      setIsReversed(prev => !prev);
+    }
   };
 
   const handleReset = () => {
@@ -48,10 +61,7 @@ export const App = () => {
   };
 
   const isChanged = () => {
-    const original = [...goodsFromServer];
-    const current = [...goods];
-
-    return original.join(',') !== current.join(',');
+    return goods.join(',') !== goodsFromServer.join(',');
   };
 
   return (
