@@ -48,7 +48,14 @@ export const App = () => {
 
   const handleReverse = () => {
     if (!sortType) {
-      setGoods(prev => [...prev].reverse());
+      setGoods(prev => {
+        const reversed = [...prev].reverse();
+        const isNowReversed = reversed.join(',') !== goodsFromServer.join(',');
+
+        setIsReversed(isNowReversed);
+
+        return reversed;
+      });
     } else {
       setIsReversed(prev => !prev);
     }
@@ -85,7 +92,7 @@ export const App = () => {
 
         <button
           type="button"
-          className={`button is-warning ${!isReversed && sortType === null ? 'is-light' : ''}`}
+          className={`button is-warning ${!isReversed ? 'is-light' : ''}`}
           onClick={handleReverse}
         >
           Reverse
